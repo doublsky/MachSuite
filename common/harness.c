@@ -14,9 +14,9 @@
 int main(int argc, char **argv)
 {
   // Parse command line.
-  char *in_file;
+  const char *in_file;
   #ifdef CHECK_OUTPUT
-  char *check_file;
+  const char *check_file;
   #endif
   assert( argc<4 && "Usage: ./benchmark <input_file> <check_file>" );
   in_file = "input.data";
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
   // Load input data
   int in_fd;
   char *data;
-  data = malloc(INPUT_SIZE);
+  data = (char*)malloc(INPUT_SIZE);
   assert( data!=NULL && "Out of memory" );
   in_fd = open( in_file, O_RDONLY );
   assert( in_fd>0 && "Couldn't open input data file");
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
   #ifdef CHECK_OUTPUT
   int check_fd;
   char *ref;
-  ref = malloc(INPUT_SIZE);
+  ref = (char*)malloc(INPUT_SIZE);
   assert( ref!=NULL && "Out of memory" );
   check_fd = open( check_file, O_RDONLY );
   assert( check_fd>0 && "Couldn't open check data file");
