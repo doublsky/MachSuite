@@ -29,7 +29,7 @@ void input_to_data(int fd, void *vdata) {
   parse_int32_t_array(s, (int32_t *)(data->n_points), blockSide*blockSide*blockSide);
 
   s = find_section_start(p,2);
-  STAC(parse_,TYPE,_array)(s, (double *)(data->position), 3*blockSide*blockSide*blockSide*densityFactor);
+  STAC(parse_,TYPE,_array)(s, (TYPE*)(data->position), 3*blockSide*blockSide*blockSide*densityFactor);
   free(p);
 }
 
@@ -40,7 +40,7 @@ void data_to_input(int fd, void *vdata) {
   write_int32_t_array(fd, (int32_t *)(data->n_points), blockSide*blockSide*blockSide);
 
   write_section_header(fd);
-  STAC(write_,TYPE,_array)(fd, (double *)(data->position), 3*blockSide*blockSide*blockSide*densityFactor);
+  STAC(write_,TYPE,_array)(fd, (TYPE*)(data->position), 3*blockSide*blockSide*blockSide*densityFactor);
 
 }
 
@@ -58,7 +58,7 @@ void output_to_data(int fd, void *vdata) {
   p = readfile(fd);
 
   s = find_section_start(p,1);
-  STAC(parse_,TYPE,_array)(s, (double *)data->force, 3*blockSide*blockSide*blockSide*densityFactor);
+  STAC(parse_,TYPE,_array)(s, (TYPE *)data->force, 3*blockSide*blockSide*blockSide*densityFactor);
   free(p);
 }
 
@@ -66,7 +66,7 @@ void data_to_output(int fd, void *vdata) {
   struct bench_args_t *data = (struct bench_args_t *)vdata;
 
   write_section_header(fd);
-  STAC(write_,TYPE,_array)(fd, (double *)data->force, 3*blockSide*blockSide*blockSide*densityFactor);
+  STAC(write_,TYPE,_array)(fd, (TYPE *)data->force, 3*blockSide*blockSide*blockSide*densityFactor);
 }
 
 int check_data( void *vdata, void *vref ) {
@@ -75,14 +75,15 @@ int check_data( void *vdata, void *vref ) {
   int has_errors = 0;
   int i, j, k, d;
   TYPE diff_x, diff_y, diff_z;
+  bool flag = true;
 
   for(i=0; i<blockSide; i++) {
     for(j=0; j<blockSide; j++) {
       for(k=0; k<blockSide; k++) {
         for(d=0; d<densityFactor; d++) {
-          diff_x = data->force[i][j][k][d].x - ref->force[i][j][k][d].x;
-          diff_y = data->force[i][j][k][d].y - ref->force[i][j][k][d].y;
-          diff_z = data->force[i][j][k][d].z - ref->force[i][j][k][d].z;
+          diff_x = data->force[IDX4D(i,j,k,d)].x - ref->force[IDX4D(i,j,k,d)].x;
+          diff_y = data->force[IDX4D(i,j,k,d)].y - ref->force[IDX4D(i,j,k,d)].y;
+          diff_z = data->force[IDX4D(i,j,k,d)].z - ref->force[IDX4D(i,j,k,d)].z;
           has_errors |= (diff_x<-EPSILON) || (EPSILON<diff_x);
           has_errors |= (diff_y<-EPSILON) || (EPSILON<diff_y);
           has_errors |= (diff_z<-EPSILON) || (EPSILON<diff_z);
