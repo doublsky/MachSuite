@@ -29,7 +29,7 @@ void input_to_data(int fd, void *vdata) {
   STAC(parse_,TYPE,_array)(s, data->orig, row_size*col_size);
 
   s = find_section_start(p,2);
-  STAC(parse_,TYPE,_array)(s, data->filter, f_size);
+  STAC(parse_,TYPE,_array)(s, (int32_t *)&(data->filter), f_size);
   free(p);
 }
 
@@ -40,7 +40,7 @@ void data_to_input(int fd, void *vdata) {
   STAC(write_,TYPE,_array)(fd, data->orig, row_size*col_size);
 
   write_section_header(fd);
-  STAC(write_,TYPE,_array)(fd, data->filter, f_size);
+  STAC(write_,TYPE,_array)(fd, (int32_t *)&(data->filter), f_size);
 }
 
 /* Output format:

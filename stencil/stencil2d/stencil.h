@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "support.h"
+#include "HLS/hls.h"
 
 //Define input sizes
 #define col_size 64
@@ -15,9 +16,14 @@
 //Set number of iterations to execute
 #define MAX_ITERATION 1
 
-void stencil( TYPE orig[row_size * col_size],
-        TYPE sol[row_size * col_size],
-        TYPE filter[f_size] );
+struct filter_t {
+    TYPE data[f_size];
+};
+
+component void stencil( 
+        hls_avalon_slave_memory_argument(row_size * col_size * sizeof(TYPE)) TYPE *orig,
+        hls_avalon_slave_memory_argument(row_size * col_size * sizeof(TYPE)) TYPE *sol,
+        filter_t filter );
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test harness interface code.
@@ -25,5 +31,5 @@ void stencil( TYPE orig[row_size * col_size],
 struct bench_args_t {
     TYPE orig[row_size*col_size];
     TYPE sol[row_size*col_size];
-    TYPE filter[f_size];
+    filter_t filter;
 };
